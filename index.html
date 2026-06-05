@@ -6,166 +6,88 @@
   <title>Spikeball Spieler Tracker</title>
   <style>
     :root {
-      --bg: #f4f6f8;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --line: #dbe1e8;
-      --primary: #0f766e;
-      --primary-strong: #115e59;
-      --secondary: #eef2f7;
-      --danger: #b91c1c;
-      --danger-bg: #fef2f2;
-      --shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-      --radius: 18px;
+      --bg: #f4f6f8; --card: #ffffff; --text: #111827; --muted: #6b7280;
+      --line: #dbe1e8; --primary: #0f766e; --primary-strong: #115e59;
+      --secondary: #eef2f7; --danger: #b91c1c; --danger-bg: #fef2f2;
+      --shadow: 0 10px 24px rgba(15,23,42,0.08); --radius: 18px;
     }
     html[data-theme="dark"] {
-      --bg: #0f172a;
-      --card: #111827;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --line: #273449;
-      --primary: #2dd4bf;
-      --primary-strong: #14b8a6;
-      --secondary: #1f2937;
-      --danger: #f87171;
-      --danger-bg: #2b1417;
-      --shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+      --bg: #0f172a; --card: #111827; --text: #f8fafc; --muted: #94a3b8;
+      --line: #273449; --primary: #2dd4bf; --primary-strong: #14b8a6;
+      --secondary: #1f2937; --danger: #f87171; --danger-bg: #2b1417;
+      --shadow: 0 12px 28px rgba(0,0,0,0.28);
     }
     * { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
+    body { margin:0; font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+    button,input,select { font:inherit; }
+    .app { width:min(100%,720px); margin:0 auto; padding:16px 14px 28px; padding-bottom:calc(28px + env(safe-area-inset-bottom)); }
+    .skip-link { position:absolute; left:-9999px; top:0; }
+    .skip-link:focus { left:12px; top:12px; z-index:20; background:var(--card); color:var(--text); padding:10px 12px; border-radius:12px; box-shadow:var(--shadow); }
+    .topbar { display:grid; gap:12px; margin-bottom:14px; }
+    .brand { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--line); border-radius:22px; padding:14px; box-shadow:var(--shadow); }
+    .logo { width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg,var(--primary),var(--primary-strong)); display:grid; place-items:center; color:white; flex:0 0 auto; }
+    .brand h1 { margin:0; font-size:1.2rem; line-height:1.1; }
+    .brand p { margin:4px 0 0; color:var(--muted); font-size:0.92rem; }
+    .toolbar { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow); margin-bottom:12px; }
+    .section-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
+    .section-head h2 { margin:0; font-size:1rem; }
+    .muted { color:var(--muted); font-size:0.92rem; }
+    .row,.grid-2 { display:grid; gap:10px; }
+    .grid-2 { grid-template-columns:1fr 1fr; }
+    input[type="text"],input[type="number"],input[type="datetime-local"],select {
+      width:100%; min-height:48px; border-radius:14px; border:1px solid var(--line);
+      background:var(--secondary); color:var(--text); padding:0 14px; outline:none;
     }
-    button, input, select { font: inherit; }
-    .app {
-      width: min(100%, 720px);
-      margin: 0 auto;
-      padding: 16px 14px 28px;
-      padding-bottom: calc(28px + env(safe-area-inset-bottom));
+    input[type="text"]:focus,input[type="number"]:focus,input[type="datetime-local"]:focus,select:focus {
+      border-color:var(--primary); box-shadow:0 0 0 3px rgba(15,118,110,0.18);
     }
-    .skip-link { position: absolute; left: -9999px; top: 0; }
-    .skip-link:focus {
-      left: 12px; top: 12px; z-index: 20;
-      background: var(--card); color: var(--text);
-      padding: 10px 12px; border-radius: 12px; box-shadow: var(--shadow);
-    }
-    .topbar { display: grid; gap: 12px; margin-bottom: 14px; }
-    .brand {
-      display: flex; align-items: center; gap: 12px;
-      background: var(--card); border: 1px solid var(--line);
-      border-radius: 22px; padding: 14px; box-shadow: var(--shadow);
-    }
-    .logo {
-      width: 44px; height: 44px; border-radius: 14px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-      display: grid; place-items: center; color: white; flex: 0 0 auto;
-    }
-    .brand h1 { margin: 0; font-size: 1.2rem; line-height: 1.1; }
-    .brand p { margin: 4px 0 0; color: var(--muted); font-size: 0.92rem; }
-    .toolbar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .card {
-      background: var(--card); border: 1px solid var(--line);
-      border-radius: var(--radius); padding: 14px;
-      box-shadow: var(--shadow); margin-bottom: 12px;
-    }
-    .section-head {
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 10px; margin-bottom: 12px;
-    }
-    .section-head h2 { margin: 0; font-size: 1rem; }
-    .muted { color: var(--muted); font-size: 0.92rem; }
-    .row, .grid-2, .grid-3 { display: grid; gap: 10px; }
-    .grid-2 { grid-template-columns: 1fr 1fr; }
-    .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
-    input[type="text"], input[type="number"], select {
-      width: 100%; min-height: 48px; border-radius: 14px;
-      border: 1px solid var(--line); background: var(--secondary);
-      color: var(--text); padding: 0 14px; outline: none;
-    }
-    input[type="text"]:focus, input[type="number"]:focus, select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.18);
-    }
-    .btn {
-      min-height: 48px; border: 0; border-radius: 14px; padding: 0 14px;
-      display: inline-flex; justify-content: center; align-items: center;
-      gap: 8px; font-weight: 700; cursor: pointer;
-      color: var(--text); background: var(--secondary);
-      transition: transform 0.05s ease, opacity 0.2s ease, background 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .btn:active { transform: scale(0.98); }
-    .btn.primary { background: var(--primary); color: #fff; }
-    .btn.primary:hover { background: var(--primary-strong); }
-    .btn.danger { background: var(--danger-bg); color: var(--danger); }
-    .btn.small {
-      min-height: 36px; min-width: 36px; padding: 0 10px;
-      border-radius: 12px; font-size: 0.95rem;
-    }
-    .stats {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 10px; margin-top: 12px;
-    }
-    .stat-box {
-      background: var(--secondary); border-radius: 16px; padding: 12px;
-      text-align: center; border: 1px solid var(--line);
-    }
-    .stat-box strong { display: block; font-size: 1.2rem; line-height: 1.1; margin-bottom: 4px; }
-    .team-box {
-      border: 1px solid var(--line); border-radius: 16px;
-      padding: 12px; background: var(--secondary);
-    }
-    .team-box h3 { margin: 0 0 10px; font-size: 0.98rem; }
-    .score-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-    .score-field {
-      border: 1px solid var(--line); border-radius: 16px;
-      padding: 12px; background: var(--secondary);
-    }
-    .score-field label { display: block; color: var(--muted); font-size: 0.84rem; margin-bottom: 6px; }
-    .team-actions { display: grid; gap: 8px; margin-top: 12px; }
-    .list { display: grid; gap: 10px; }
-    .player-item, .match-item {
-      border: 1px solid var(--line); background: var(--card);
-      border-radius: 16px; padding: 12px;
-    }
-    .player-top {
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 12px; margin-bottom: 10px;
-    }
-    .rank {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-width: 34px; height: 34px; border-radius: 999px;
-      background: var(--secondary); border: 1px solid var(--line);
-      font-weight: 700; font-size: 0.95rem;
-    }
-    .player-name { font-weight: 700; font-size: 1rem; }
-    .player-sub { color: var(--muted); font-size: 0.88rem; margin-top: 2px; }
-    .pill-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-    .pill {
-      border-radius: 14px; padding: 10px 12px;
-      background: var(--secondary); border: 1px solid var(--line);
-    }
-    .pill-label { color: var(--muted); font-size: 0.82rem; display: block; margin-bottom: 4px; }
-    .pill-value { font-size: 1.1rem; font-weight: 700; }
-    .match-item { display: grid; gap: 8px; }
-    .match-meta { color: var(--muted); font-size: 0.86rem; }
-    .empty {
-      padding: 12px; border-radius: 16px; background: var(--secondary);
-      border: 1px dashed var(--line); color: var(--muted); text-align: center;
-    }
-    .footer-note {
-      color: var(--muted); text-align: center;
-      font-size: 0.84rem; padding: 4px 0 12px;
-    }
-    @media (max-width: 480px) {
-      .toolbar, .grid-2, .grid-3, .stats, .pill-row, .score-box {
-        grid-template-columns: 1fr;
-      }
+    .btn { min-height:48px; border:0; border-radius:14px; padding:0 14px; display:inline-flex; justify-content:center; align-items:center; gap:8px; font-weight:700; cursor:pointer; color:var(--text); background:var(--secondary); transition:transform 0.05s ease,opacity 0.2s ease,background 0.2s ease; -webkit-tap-highlight-color:transparent; }
+    .btn:active { transform:scale(0.98); }
+    .btn.primary { background:var(--primary); color:#fff; }
+    .btn.primary:hover { background:var(--primary-strong); }
+    .btn.danger { background:var(--danger-bg); color:var(--danger); }
+    .btn.small { min-height:36px; min-width:36px; padding:0 10px; border-radius:12px; font-size:0.95rem; }
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:12px; }
+    .stat-box { background:var(--secondary); border-radius:16px; padding:12px; text-align:center; border:1px solid var(--line); }
+    .stat-box strong { display:block; font-size:1.2rem; line-height:1.1; margin-bottom:4px; }
+    .team-box { border:1px solid var(--line); border-radius:16px; padding:12px; background:var(--secondary); }
+    .team-box h3 { margin:0 0 10px; font-size:0.98rem; }
+    .score-box { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+    .score-field { border:1px solid var(--line); border-radius:16px; padding:12px; background:var(--secondary); }
+    .score-field label { display:block; color:var(--muted); font-size:0.84rem; margin-bottom:6px; }
+    .team-actions { display:grid; gap:8px; margin-top:12px; }
+    .list { display:grid; gap:10px; }
+    .player-item,.match-item { border:1px solid var(--line); background:var(--card); border-radius:16px; padding:12px; }
+    .player-top { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px; }
+    .rank { display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:34px; border-radius:999px; background:var(--secondary); border:1px solid var(--line); font-weight:700; font-size:0.95rem; }
+    .player-name { font-weight:700; font-size:1rem; }
+    .player-sub { color:var(--muted); font-size:0.88rem; margin-top:2px; }
+    .pill-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .pill { border-radius:14px; padding:10px 12px; background:var(--secondary); border:1px solid var(--line); }
+    .pill-label { color:var(--muted); font-size:0.82rem; display:block; margin-bottom:4px; }
+    .pill-value { font-size:1.1rem; font-weight:700; }
+    .match-item { display:grid; gap:8px; }
+    .match-meta { color:var(--muted); font-size:0.86rem; }
+    .empty { padding:12px; border-radius:16px; background:var(--secondary); border:1px dashed var(--line); color:var(--muted); text-align:center; }
+    .footer-note { color:var(--muted); text-align:center; font-size:0.84rem; padding:4px 0 12px; }
+    details { margin-top:10px; }
+    details > summary { cursor:pointer; font-size:0.9rem; color:var(--primary); padding:6px 0; list-style:none; display:flex; align-items:center; gap:6px; }
+    details > summary::-webkit-details-marker { display:none; }
+    details > summary::before { content:"▶"; font-size:0.75rem; transition:transform 0.2s; }
+    details[open] > summary::before { transform:rotate(90deg); }
+    .partner-table { width:100%; border-collapse:collapse; margin-top:8px; font-size:0.88rem; }
+    .partner-table th { text-align:left; color:var(--muted); font-weight:600; padding:4px 8px; border-bottom:1px solid var(--line); }
+    .partner-table td { padding:6px 8px; border-bottom:1px solid var(--line); }
+    .partner-table tr:last-child td { border-bottom:none; }
+    .filter-label { display:block; color:var(--muted); font-size:0.84rem; margin-bottom:6px; font-weight:600; }
+    .filter-row { display:grid; gap:10px; }
+    .filter-name-row { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:end; margin-top:10px; }
+    .active-filter-badge { display:inline-flex; align-items:center; gap:6px; background:var(--primary); color:#fff; border-radius:999px; padding:4px 12px; font-size:0.85rem; font-weight:700; }
+    @media (max-width:480px) {
+      .toolbar,.grid-2,.stats,.pill-row,.score-box { grid-template-columns:1fr; }
+      .filter-name-row { grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -183,7 +105,7 @@
         </div>
         <div>
           <h1>Spikeball Spieler Tracker</h1>
-          <p>CSV importieren, Spiele mit Punkten eintragen, zwei Ranglisten sehen.</p>
+          <p>Zeitraum filtern · Rangliste nach Quote · CSV Import/Export</p>
         </div>
       </div>
       <div class="toolbar">
@@ -195,6 +117,36 @@
     </header>
 
     <main id="main">
+
+      <!-- ZEITRAUM FILTER -->
+      <section class="card">
+        <div class="section-head">
+          <h2>⏱ Zeitraum</h2>
+          <span id="activeFilterBadge"></span>
+        </div>
+        <div class="filter-row">
+          <div class="grid-2">
+            <div>
+              <label class="filter-label" for="filterFrom">Von</label>
+              <input type="datetime-local" id="filterFrom" />
+            </div>
+            <div>
+              <label class="filter-label" for="filterTo">Bis</label>
+              <input type="datetime-local" id="filterTo" />
+            </div>
+          </div>
+          <div class="filter-name-row">
+            <div>
+              <label class="filter-label" for="filterName">Turniername (optional)</label>
+              <input type="text" id="filterName" placeholder="z. B. Samstags Turnier" maxlength="60" />
+            </div>
+            <button class="btn primary" id="applyFilterBtn" type="button" style="white-space:nowrap;">Filter anwenden</button>
+          </div>
+          <button class="btn" id="clearFilterBtn" type="button">Filter zurücksetzen (alle Spiele)</button>
+        </div>
+      </section>
+
+      <!-- ÜBERSICHT -->
       <section class="card">
         <div class="section-head">
           <h2>Übersicht</h2>
@@ -203,11 +155,12 @@
         <div class="stats">
           <div class="stat-box"><strong id="playersCount">0</strong><span>Spieler</span></div>
           <div class="stat-box"><strong id="matchesCount">0</strong><span>Spiele</span></div>
-          <div class="stat-box"><strong id="leaderName">-</strong><span>Siege vorne</span></div>
-          <div class="stat-box"><strong id="pointsLeaderName">-</strong><span>Punkte vorne</span></div>
+          <div class="stat-box"><strong id="leaderName">-</strong><span>Quote vorne</span></div>
+          <div class="stat-box"><strong id="pointsLeaderName">-</strong><span>Ø Pkt vorne</span></div>
         </div>
       </section>
 
+      <!-- SPIELER HINZUFÜGEN -->
       <section class="card">
         <div class="section-head">
           <h2>Spieler hinzufügen</h2>
@@ -219,10 +172,11 @@
         </div>
       </section>
 
+      <!-- SPIEL EINTRAGEN -->
       <section class="card">
         <div class="section-head">
           <h2>Spiel eintragen</h2>
-          <span class="muted">Teams wählen, Punkte eintragen, Sieger-Team speichern</span>
+          <span class="muted">Teams wählen, Punkte eintragen, Sieger speichern</span>
         </div>
         <div class="grid-2">
           <div class="team-box">
@@ -256,26 +210,23 @@
         </div>
       </section>
 
+      <!-- RANGLISTE -->
       <section class="card">
         <div class="section-head">
-          <h2>Siegerliste</h2>
-          <span class="muted">Sortiert nach Siegen</span>
+          <h2>🏆 Rangliste</h2>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span class="muted">Sortiert nach Siegquote</span>
+            <button class="btn small" id="exportImageBtn" type="button" title="Rangliste als Bild exportieren">📸 Bild</button>
+          </div>
         </div>
         <div id="winsList" class="list"></div>
       </section>
 
-      <section class="card">
-        <div class="section-head">
-          <h2>Punkteliste</h2>
-          <span class="muted">Sortiert nach Gesamtpunkten</span>
-        </div>
-        <div id="pointsList" class="list"></div>
-      </section>
-
+      <!-- LETZTE SPIELE -->
       <section class="card">
         <div class="section-head">
           <h2>Letzte Spiele</h2>
-          <span class="muted">Mit Punkten und Löschen</span>
+          <span class="muted" id="matchesFilterHint"></span>
         </div>
         <div id="matchesList" class="list"></div>
       </section>
@@ -285,9 +236,12 @@
   </div>
 
   <input id="fileInput" type="file" accept=".csv,text/csv" hidden />
+  <!-- Hidden canvas for image export -->
+  <canvas id="exportCanvas" style="display:none;"></canvas>
 
   <script>
     const state = { players: [], matches: [] };
+    const filter = { from: null, to: null, name: '' };
 
     const els = {
       playerNameInput: document.getElementById('playerNameInput'),
@@ -303,7 +257,6 @@
       pointsLeaderName: document.getElementById('pointsLeaderName'),
       summaryText: document.getElementById('summaryText'),
       winsList: document.getElementById('winsList'),
-      pointsList: document.getElementById('pointsList'),
       matchesList: document.getElementById('matchesList'),
       teamA1: document.getElementById('teamA1'),
       teamA2: document.getElementById('teamA2'),
@@ -312,118 +265,163 @@
       scoreA: document.getElementById('scoreA'),
       scoreB: document.getElementById('scoreB'),
       teamAWinBtn: document.getElementById('teamAWinBtn'),
-      teamBWinBtn: document.getElementById('teamBWinBtn')
+      teamBWinBtn: document.getElementById('teamBWinBtn'),
+      filterFrom: document.getElementById('filterFrom'),
+      filterTo: document.getElementById('filterTo'),
+      filterName: document.getElementById('filterName'),
+      applyFilterBtn: document.getElementById('applyFilterBtn'),
+      clearFilterBtn: document.getElementById('clearFilterBtn'),
+      activeFilterBadge: document.getElementById('activeFilterBadge'),
+      matchesFilterHint: document.getElementById('matchesFilterHint'),
+      exportImageBtn: document.getElementById('exportImageBtn'),
+      exportCanvas: document.getElementById('exportCanvas')
     };
 
     function uid() {
       return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
     }
 
-    function escapeHtml(value) {
-      return String(value)
-        .replaceAll('&', '&amp;').replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+    function escapeHtml(v) {
+      return String(v)
+        .replaceAll('&','&amp;').replaceAll('<','&lt;')
+        .replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
     }
 
-    function csvEscape(value) {
-      const text = String(value ?? '');
-      if (/[",\n]/.test(text)) return '"' + text.replaceAll('"', '""') + '"';
-      return text;
+    function csvEscape(v) {
+      const t = String(v ?? '');
+      if (/[",\n]/.test(t)) return '"' + t.replaceAll('"','""') + '"';
+      return t;
     }
 
     function parseCsv(text) {
       const rows = [];
-      let row = [], cell = '', inQuotes = false;
+      let row = [], cell = '', inQ = false;
       for (let i = 0; i < text.length; i++) {
-        const char = text[i], next = text[i + 1];
-        if (char === '"') {
-          if (inQuotes && next === '"') { cell += '"'; i++; }
-          else inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-          row.push(cell); cell = '';
-        } else if ((char === '\n' || char === '\r') && !inQuotes) {
-          if (char === '\r' && next === '\n') i++;
+        const c = text[i], n = text[i+1];
+        if (c === '"') { if (inQ && n === '"') { cell += '"'; i++; } else inQ = !inQ; }
+        else if (c === ',' && !inQ) { row.push(cell); cell = ''; }
+        else if ((c === '\n' || c === '\r') && !inQ) {
+          if (c === '\r' && n === '\n') i++;
           row.push(cell);
-          if (row.some(item => item !== '')) rows.push(row);
+          if (row.some(x => x !== '')) rows.push(row);
           row = []; cell = '';
-        } else { cell += char; }
+        } else cell += c;
       }
-      if (cell.length || row.length) {
-        row.push(cell);
-        if (row.some(item => item !== '')) rows.push(row);
-      }
+      if (cell.length || row.length) { row.push(cell); if (row.some(x => x !== '')) rows.push(row); }
       return rows;
     }
 
     function getPlayerById(id) { return state.players.find(p => p.id === id); }
 
-    function getSortedByWins() {
-      return [...state.players].sort((a, b) => {
-        if (b.wins !== a.wins) return b.wins - a.wins;
-        if (b.points !== a.points) return b.points - a.points;
-        if (b.played !== a.played) return b.played - a.played;
-        return a.name.localeCompare(b.name, 'de');
+    // Returns matches within current filter range
+    function getFilteredMatches() {
+      return state.matches.filter(m => {
+        const t = new Date(m.createdAt).getTime();
+        if (filter.from && t < filter.from) return false;
+        if (filter.to && t > filter.to) return false;
+        return true;
       });
     }
 
-    function getSortedByPoints() {
-      return [...state.players].sort((a, b) => {
-        if (b.points !== a.points) return b.points - a.points;
-        if (b.wins !== a.wins) return b.wins - a.wins;
+    // Build per-player stats from a set of matches
+    function buildStats(matches) {
+      const map = {};
+      state.players.forEach(p => {
+        map[p.id] = { id: p.id, name: p.name, wins: 0, played: 0, totalPoints: 0, partners: {}, opponents: {} };
+      });
+
+      matches.forEach(m => {
+        const teamA = [m.a1, m.a2];
+        const teamB = [m.b1, m.b2];
+        const winnerTeam = m.winner === 'A' ? teamA : teamB;
+        const sA = Number(m.scoreA || 0);
+        const sB = Number(m.scoreB || 0);
+
+        // played + points
+        teamA.forEach(id => { if (map[id]) { map[id].played++; map[id].totalPoints += sA; } });
+        teamB.forEach(id => { if (map[id]) { map[id].played++; map[id].totalPoints += sB; } });
+
+        // wins
+        winnerTeam.forEach(id => { if (map[id]) map[id].wins++; });
+
+        // partner tracking
+        if (map[m.a1] && map[m.a2]) {
+          map[m.a1].partners[m.a2] = (map[m.a1].partners[m.a2] || 0) + 1;
+          map[m.a2].partners[m.a1] = (map[m.a2].partners[m.a1] || 0) + 1;
+        }
+        if (map[m.b1] && map[m.b2]) {
+          map[m.b1].partners[m.b2] = (map[m.b1].partners[m.b2] || 0) + 1;
+          map[m.b2].partners[m.b1] = (map[m.b2].partners[m.b1] || 0) + 1;
+        }
+
+        // opponent tracking
+        teamA.forEach(idA => {
+          teamB.forEach(idB => {
+            if (map[idA]) map[idA].opponents[idB] = (map[idA].opponents[idB] || 0) + 1;
+            if (map[idB]) map[idB].opponents[idA] = (map[idB].opponents[idA] || 0) + 1;
+          });
+        });
+      });
+
+      return Object.values(map).map(p => ({
+        ...p,
+        quote: p.played > 0 ? p.wins / p.played : 0,
+        avgPoints: p.played > 0 ? p.totalPoints / p.played : 0
+      }));
+    }
+
+    function getSortedStats(stats) {
+      return [...stats].sort((a, b) => {
+        // Primary: win quote (desc)
+        const qDiff = b.quote - a.quote;
+        if (Math.abs(qDiff) > 0.0001) return qDiff;
+        // Tiebreak: avg points per game (desc)
+        const pDiff = b.avgPoints - a.avgPoints;
+        if (Math.abs(pDiff) > 0.0001) return pDiff;
+        // Tiebreak: games played (desc)
         if (b.played !== a.played) return b.played - a.played;
         return a.name.localeCompare(b.name, 'de');
       });
     }
 
     function addPlayer(name) {
-      const cleanName = name.trim();
-      if (!cleanName) return alert('Bitte einen Namen eingeben.');
-      if (state.players.some(p => p.name.toLowerCase() === cleanName.toLowerCase()))
+      const n = name.trim();
+      if (!n) return alert('Bitte einen Namen eingeben.');
+      if (state.players.some(p => p.name.toLowerCase() === n.toLowerCase()))
         return alert('Diesen Spieler gibt es schon.');
-      state.players.push({ id: uid(), name: cleanName, wins: 0, played: 0, points: 0 });
+      state.players.push({ id: uid(), name: n, wins: 0, played: 0, points: 0 });
       els.playerNameInput.value = '';
       render();
-    }
-
-    function getSelectedPlayers() {
-      return [els.teamA1.value, els.teamA2.value, els.teamB1.value, els.teamB2.value].filter(Boolean);
     }
 
     function clearScoreInputs() { els.scoreA.value = ''; els.scoreB.value = ''; }
 
     function recordMatch(winner) {
       if (state.players.length < 4) return alert('Du brauchst mindestens 4 Spieler.');
-      const ids = getSelectedPlayers();
+      const ids = [els.teamA1.value, els.teamA2.value, els.teamB1.value, els.teamB2.value].filter(Boolean);
       if (ids.length !== 4) return alert('Bitte alle 4 Spieler auswählen.');
-      if (new Set(ids).size !== 4) return alert('Jeder Spieler darf in einem Spiel nur einmal vorkommen.');
-      const scoreA = Number(els.scoreA.value);
-      const scoreB = Number(els.scoreB.value);
-      if (!Number.isInteger(scoreA) || scoreA < 0 || !Number.isInteger(scoreB) || scoreB < 0)
-        return alert('Bitte gültige Punkte für beide Teams eintragen.');
-      if (scoreA === scoreB) return alert('Die Punkte dürfen nicht gleich sein.');
-      if (winner === 'A' && scoreA <= scoreB) return alert('Wenn Team 1 gewinnt, muss Team 1 mehr Punkte haben.');
-      if (winner === 'B' && scoreB <= scoreA) return alert('Wenn Team 2 gewinnt, muss Team 2 mehr Punkte haben.');
+      if (new Set(ids).size !== 4) return alert('Jeder Spieler darf nur einmal vorkommen.');
+      const sA = Number(els.scoreA.value);
+      const sB = Number(els.scoreB.value);
+      if (!Number.isInteger(sA)||sA<0||!Number.isInteger(sB)||sB<0) return alert('Bitte gültige Punkte eintragen.');
+      if (sA === sB) return alert('Punkte dürfen nicht gleich sein.');
+      if (winner==='A'&&sA<=sB) return alert('Wenn Team 1 gewinnt, muss Team 1 mehr Punkte haben.');
+      if (winner==='B'&&sB<=sA) return alert('Wenn Team 2 gewinnt, muss Team 2 mehr Punkte haben.');
 
       const match = {
         id: uid(),
         a1: els.teamA1.value, a2: els.teamA2.value,
         b1: els.teamB1.value, b2: els.teamB2.value,
-        scoreA, scoreB, winner,
+        scoreA: sA, scoreB: sB, winner,
         createdAt: new Date().toISOString()
       };
 
-      [match.a1, match.a2, match.b1, match.b2].forEach(id => {
-        const p = getPlayerById(id); if (p) p.played += 1;
-      });
-      [match.a1, match.a2].forEach(id => {
-        const p = getPlayerById(id); if (p) p.points += scoreA;
-      });
-      [match.b1, match.b2].forEach(id => {
-        const p = getPlayerById(id); if (p) p.points += scoreB;
-      });
-      (winner === 'A' ? [match.a1, match.a2] : [match.b1, match.b2]).forEach(id => {
-        const p = getPlayerById(id); if (p) p.wins += 1;
-      });
+      // Update legacy totals on player objects for CSV backward compat
+      const teamA=[match.a1,match.a2], teamB=[match.b1,match.b2];
+      [...teamA,...teamB].forEach(id=>{ const p=getPlayerById(id); if(p) p.played++; });
+      teamA.forEach(id=>{ const p=getPlayerById(id); if(p) p.points+=sA; });
+      teamB.forEach(id=>{ const p=getPlayerById(id); if(p) p.points+=sB; });
+      (winner==='A'?teamA:teamB).forEach(id=>{ const p=getPlayerById(id); if(p) p.wins++; });
 
       state.matches.unshift(match);
       clearScoreInputs();
@@ -431,40 +429,32 @@
     }
 
     function deleteMatch(matchId) {
-      const index = state.matches.findIndex(m => m.id === matchId);
-      if (index === -1) return;
-      const match = state.matches[index];
-      [match.a1, match.a2, match.b1, match.b2].forEach(id => {
-        const p = getPlayerById(id); if (p) p.played = Math.max(0, p.played - 1);
-      });
-      [match.a1, match.a2].forEach(id => {
-        const p = getPlayerById(id); if (p) p.points = Math.max(0, p.points - Number(match.scoreA || 0));
-      });
-      [match.b1, match.b2].forEach(id => {
-        const p = getPlayerById(id); if (p) p.points = Math.max(0, p.points - Number(match.scoreB || 0));
-      });
-      (match.winner === 'A' ? [match.a1, match.a2] : [match.b1, match.b2]).forEach(id => {
-        const p = getPlayerById(id); if (p) p.wins = Math.max(0, p.wins - 1);
-      });
-      state.matches.splice(index, 1);
+      const idx = state.matches.findIndex(m => m.id === matchId);
+      if (idx === -1) return;
+      const m = state.matches[idx];
+      const teamA=[m.a1,m.a2], teamB=[m.b1,m.b2];
+      [...teamA,...teamB].forEach(id=>{ const p=getPlayerById(id); if(p) p.played=Math.max(0,p.played-1); });
+      teamA.forEach(id=>{ const p=getPlayerById(id); if(p) p.points=Math.max(0,p.points-Number(m.scoreA||0)); });
+      teamB.forEach(id=>{ const p=getPlayerById(id); if(p) p.points=Math.max(0,p.points-Number(m.scoreB||0)); });
+      (m.winner==='A'?teamA:teamB).forEach(id=>{ const p=getPlayerById(id); if(p) p.wins=Math.max(0,p.wins-1); });
+      state.matches.splice(idx,1);
       render();
     }
 
+    // ---- CSV Export / Import (structure unchanged) ----
     function exportCsv() {
       const lines = [];
       lines.push(['type','id','name','wins','played','points','a1','a2','b1','b2','scoreA','scoreB','winner','createdAt'].join(','));
       state.players.forEach(p => {
-        lines.push(['player', csvEscape(p.id), csvEscape(p.name), p.wins, p.played, p.points, '','','','','','','',''].join(','));
+        lines.push(['player',csvEscape(p.id),csvEscape(p.name),p.wins,p.played,p.points,'','','','','','','',''].join(','));
       });
       state.matches.forEach(m => {
-        lines.push(['match', csvEscape(m.id), '','','','',
-          csvEscape(m.a1), csvEscape(m.a2), csvEscape(m.b1), csvEscape(m.b2),
-          m.scoreA, m.scoreB, csvEscape(m.winner), csvEscape(m.createdAt)].join(','));
+        lines.push(['match',csvEscape(m.id),'','','','',csvEscape(m.a1),csvEscape(m.a2),csvEscape(m.b1),csvEscape(m.b2),m.scoreA,m.scoreB,csvEscape(m.winner),csvEscape(m.createdAt)].join(','));
       });
-      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = 'spikeball-daten.csv';
+      a.href=url; a.download='spikeball-daten.csv';
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(url);
     }
@@ -473,165 +463,320 @@
       const reader = new FileReader();
       reader.onload = () => {
         try {
-          const rows = parseCsv(String(reader.result || '').trim());
-          if (!rows.length) throw new Error('Leere Datei');
-          const bodyRows = rows.slice(1);
-          const importedPlayers = [], importedMatches = [];
-          bodyRows.forEach(columns => {
-            const [type, id, name, wins, played, points, a1, a2, b1, b2, scoreA, scoreB, winner, createdAt] = columns;
-            if (type === 'player') {
-              importedPlayers.push({
-                id: id || uid(), name: (name || '').trim(),
-                wins: Math.max(0, Number(wins || 0)),
-                played: Math.max(0, Number(played || 0)),
-                points: Math.max(0, Number(points || 0))
-              });
-            }
-            if (type === 'match') {
-              importedMatches.push({
-                id: id || uid(), a1, a2, b1, b2,
-                scoreA: Math.max(0, Number(scoreA || 0)),
-                scoreB: Math.max(0, Number(scoreB || 0)),
-                winner: winner === 'B' ? 'B' : 'A',
-                createdAt: createdAt || new Date().toISOString()
-              });
-            }
+          const rows = parseCsv(String(reader.result||'').trim());
+          if (!rows.length) throw new Error('empty');
+          const body = rows.slice(1);
+          const imp = [], imm = [];
+          body.forEach(cols => {
+            const [type,id,name,wins,played,points,a1,a2,b1,b2,scoreA,scoreB,winner,createdAt] = cols;
+            if (type==='player') imp.push({id:id||uid(),name:(name||'').trim(),wins:Math.max(0,Number(wins||0)),played:Math.max(0,Number(played||0)),points:Math.max(0,Number(points||0))});
+            if (type==='match') imm.push({id:id||uid(),a1,a2,b1,b2,scoreA:Math.max(0,Number(scoreA||0)),scoreB:Math.max(0,Number(scoreB||0)),winner:winner==='B'?'B':'A',createdAt:createdAt||new Date().toISOString()});
           });
-          state.players = importedPlayers.filter(p => p.name);
-          state.matches = importedMatches.filter(m =>
-            [m.a1, m.a2, m.b1, m.b2].every(id => state.players.some(p => p.id === id))
-          );
+          state.players = imp.filter(p=>p.name);
+          state.matches = imm.filter(m=>[m.a1,m.a2,m.b1,m.b2].every(id=>state.players.some(p=>p.id===id)));
           render();
-        } catch (e) { alert('CSV konnte nicht importiert werden.'); }
+        } catch(e) { alert('CSV konnte nicht importiert werden.'); }
       };
-      reader.readAsText(file, 'utf-8');
+      reader.readAsText(file,'utf-8');
     }
 
-    function formatMatch(match) {
-      const a1 = getPlayerById(match.a1)?.name || '?';
-      const a2 = getPlayerById(match.a2)?.name || '?';
-      const b1 = getPlayerById(match.b1)?.name || '?';
-      const b2 = getPlayerById(match.b2)?.name || '?';
-      return {
-        teams: `${a1} & ${a2} (${match.scoreA}) vs. ${b1} & ${b2} (${match.scoreB})`,
-        winner: match.winner === 'A' ? `${a1} & ${a2}` : `${b1} & ${b2}`
-      };
+    // ---- Image Export ----
+    function exportImage() {
+      const filteredMatches = getFilteredMatches();
+      const stats = getSortedStats(buildStats(filteredMatches));
+      const title = filter.name || 'Spikeball Rangliste';
+      const label = filter.from || filter.to
+        ? formatDateRange(filter.from, filter.to)
+        : 'Alle Spiele';
+
+      const rowH = 60, padX = 28, headerH = 110, footerH = 36;
+      const W = 600, H = headerH + stats.length * rowH + footerH + 20;
+
+      const canvas = els.exportCanvas;
+      canvas.width = W * 2;
+      canvas.height = H * 2;
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      const ctx = canvas.getContext('2d');
+      ctx.scale(2, 2);
+
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const bg = isDark ? '#111827' : '#ffffff';
+      const fg = isDark ? '#f8fafc' : '#111827';
+      const muted = isDark ? '#94a3b8' : '#6b7280';
+      const line = isDark ? '#273449' : '#dbe1e8';
+      const accent = isDark ? '#2dd4bf' : '#0f766e';
+      const rowBg = isDark ? '#1f2937' : '#f4f6f8';
+
+      // Background
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+
+      // Header
+      ctx.fillStyle = accent;
+      ctx.fillRect(0, 0, W, headerH - 10);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px Inter, system-ui, sans-serif';
+      ctx.fillText(title, padX, 42);
+      ctx.font = '14px Inter, system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.fillText(label + ' · ' + filteredMatches.length + ' Spiele', padX, 66);
+
+      // Column headers
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, headerH - 10, W, 30);
+      ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+      ctx.fillStyle = muted;
+      ctx.fillText('#', padX, headerH + 12);
+      ctx.fillText('SPIELER', padX + 36, headerH + 12);
+      ctx.textAlign = 'right';
+      ctx.fillText('QUOTE', W - padX - 160, headerH + 12);
+      ctx.fillText('SIEGE', W - padX - 80, headerH + 12);
+      ctx.fillText('SPIELE', W - padX, headerH + 12);
+      ctx.textAlign = 'left';
+
+      // Divider
+      ctx.strokeStyle = line;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padX, headerH + 18);
+      ctx.lineTo(W - padX, headerH + 18);
+      ctx.stroke();
+
+      // Rows
+      stats.forEach((p, i) => {
+        const y = headerH + 18 + i * rowH;
+        if (i % 2 === 0) {
+          ctx.fillStyle = rowBg;
+          ctx.beginPath();
+          ctx.roundRect(padX - 8, y + 4, W - 2*(padX-8), rowH - 6, 10);
+          ctx.fill();
+        }
+
+        // Rank
+        ctx.font = 'bold 16px Inter, system-ui, sans-serif';
+        ctx.fillStyle = i === 0 ? accent : fg;
+        ctx.fillText('#' + (i+1), padX, y + 34);
+
+        // Name
+        ctx.font = 'bold 16px Inter, system-ui, sans-serif';
+        ctx.fillStyle = fg;
+        ctx.fillText(p.name, padX + 36, y + 34);
+
+        // Sub line
+        ctx.font = '12px Inter, system-ui, sans-serif';
+        ctx.fillStyle = muted;
+        ctx.fillText('Ø ' + p.avgPoints.toFixed(1) + ' Pkt/Spiel', padX + 36, y + 50);
+
+        // Stats right-aligned
+        ctx.textAlign = 'right';
+        ctx.font = 'bold 16px Inter, system-ui, sans-serif';
+        ctx.fillStyle = i === 0 ? accent : fg;
+        ctx.fillText(Math.round(p.quote * 100) + '%', W - padX - 160, y + 34);
+        ctx.fillStyle = fg;
+        ctx.fillText(p.wins, W - padX - 80, y + 34);
+        ctx.fillText(p.played, W - padX, y + 34);
+        ctx.textAlign = 'left';
+      });
+
+      // Footer
+      ctx.fillStyle = muted;
+      ctx.font = '11px Inter, system-ui, sans-serif';
+      const now = new Date().toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'});
+      ctx.fillText('Erstellt: ' + now, padX, H - 14);
+
+      // Download
+      const a = document.createElement('a');
+      a.download = (filter.name||'spikeball-rangliste').replace(/\s+/g,'-').toLowerCase() + '.png';
+      a.href = canvas.toDataURL('image/png');
+      document.body.appendChild(a); a.click(); a.remove();
     }
 
+    function formatDateRange(from, to) {
+      const opts = { dateStyle: 'short', timeStyle: 'short' };
+      const f = from ? new Date(from).toLocaleString('de-DE', opts) : '...';
+      const t = to ? new Date(to).toLocaleString('de-DE', opts) : '...';
+      return f + ' – ' + t;
+    }
+
+    // ---- Render ----
     function renderSelects() {
-      const options = ['<option value="">Bitte wählen</option>']
-        .concat(state.players.map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`))
+      const opts = ['<option value="">Bitte wählen</option>']
+        .concat(state.players.map(p=>`<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`))
         .join('');
-      [els.teamA1, els.teamA2, els.teamB1, els.teamB2].forEach(select => {
-        const current = select.value;
-        select.innerHTML = options;
-        if (state.players.some(p => p.id === current)) select.value = current;
+      [els.teamA1,els.teamA2,els.teamB1,els.teamB2].forEach(sel=>{
+        const cur = sel.value;
+        sel.innerHTML = opts;
+        if (state.players.some(p=>p.id===cur)) sel.value = cur;
       });
     }
 
-    function renderRanking(target, players, mode) {
-      if (!players.length) {
-        target.innerHTML = '<div class="empty">Noch keine Spieler eingetragen.</div>';
+    function renderRanking(stats) {
+      if (!stats.length) {
+        els.winsList.innerHTML = '<div class="empty">Noch keine Spieler eingetragen.</div>';
         return;
       }
-      target.innerHTML = players.map((player, index) => {
-        const quote = player.played ? Math.round((player.wins / player.played) * 100) : 0;
-        const mainValue = mode === 'wins' ? player.wins : player.points;
-        const mainLabel = mode === 'wins' ? 'Siege' : 'Punkte';
+
+      els.winsList.innerHTML = stats.map((p, i) => {
+        const quoteStr = p.played > 0 ? Math.round(p.quote * 100) + '%' : '—';
+        const avgStr = p.played > 0 ? p.avgPoints.toFixed(1) : '—';
+
+        // Partner detail table
+        const partnerEntries = Object.entries(p.partners).sort((a,b)=>b[1]-a[1]);
+        const opponentEntries = Object.entries(p.opponents).sort((a,b)=>b[1]-a[1]);
+
+        // Calculate how many times they still need to play with each other player
+        // (simple: show "noch nicht gespielt" for players with 0 partnership)
+        const allOtherPlayers = state.players.filter(pl => pl.id !== p.id);
+        const partnerMap = p.partners;
+
+        const partnerRows = allOtherPlayers.map(pl => {
+          const together = partnerMap[pl.id] || 0;
+          const against = p.opponents[pl.id] || 0;
+          return `<tr>
+            <td>${escapeHtml(pl.name)}</td>
+            <td style="text-align:center">${together}</td>
+            <td style="text-align:center">${against}</td>
+          </tr>`;
+        }).join('');
+
         return `
           <article class="player-item">
             <div class="player-top">
               <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-                <span class="rank">#${index + 1}</span>
+                <span class="rank">#${i+1}</span>
                 <div>
-                  <div class="player-name">${escapeHtml(player.name)}</div>
-                  <div class="player-sub">${quote}% Siegquote</div>
+                  <div class="player-name">${escapeHtml(p.name)}</div>
+                  <div class="player-sub">${p.played} Spiele gespielt</div>
                 </div>
               </div>
             </div>
             <div class="pill-row">
               <div class="pill">
-                <span class="pill-label">${mainLabel}</span>
-                <span class="pill-value">${mainValue}</span>
+                <span class="pill-label">Siegquote</span>
+                <span class="pill-value">${quoteStr}</span>
               </div>
               <div class="pill">
-                <span class="pill-label">Spiele</span>
-                <span class="pill-value">${player.played}</span>
-              </div>
-              <div class="pill">
-                <span class="pill-label">Punkte</span>
-                <span class="pill-value">${player.points}</span>
+                <span class="pill-label">Ø Punkte/Spiel</span>
+                <span class="pill-value">${avgStr}</span>
               </div>
             </div>
+            <details>
+              <summary>Spielpartner &amp; Gegner Details</summary>
+              <table class="partner-table">
+                <thead>
+                  <tr>
+                    <th>Spieler</th>
+                    <th style="text-align:center">Zusammen</th>
+                    <th style="text-align:center">Gegeneinander</th>
+                  </tr>
+                </thead>
+                <tbody>${partnerRows}</tbody>
+              </table>
+            </details>
           </article>`;
       }).join('');
     }
 
-    function renderMatches() {
-      if (!state.matches.length) {
-        els.matchesList.innerHTML = '<div class="empty">Noch keine Spiele erfasst.</div>';
+    function renderMatches(filteredMatches) {
+      const hint = filter.from || filter.to
+        ? `${filteredMatches.length} im Zeitraum`
+        : `${filteredMatches.length} gesamt`;
+      els.matchesFilterHint.textContent = hint;
+
+      if (!filteredMatches.length) {
+        els.matchesList.innerHTML = '<div class="empty">Keine Spiele im gewählten Zeitraum.</div>';
         return;
       }
-      els.matchesList.innerHTML = state.matches.slice(0, 20).map(match => {
-        const data = formatMatch(match);
-        const date = new Date(match.createdAt);
-        const timeLabel = Number.isNaN(date.getTime()) ? '' :
-          date.toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' });
+
+      els.matchesList.innerHTML = filteredMatches.slice(0, 20).map(m => {
+        const a1 = getPlayerById(m.a1)?.name || '?';
+        const a2 = getPlayerById(m.a2)?.name || '?';
+        const b1 = getPlayerById(m.b1)?.name || '?';
+        const b2 = getPlayerById(m.b2)?.name || '?';
+        const winnerStr = m.winner === 'A' ? `${a1} & ${a2}` : `${b1} & ${b2}`;
+        const teams = `${a1} & ${a2} (${m.scoreA}) vs. ${b1} & ${b2} (${m.scoreB})`;
+        const date = new Date(m.createdAt);
+        const timeLabel = isNaN(date.getTime()) ? '' : date.toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short'});
         return `
           <article class="match-item">
-            <strong>${escapeHtml(data.teams)}</strong>
-            <div>Gewonnen: <strong>${escapeHtml(data.winner)}</strong></div>
+            <strong>${escapeHtml(teams)}</strong>
+            <div>Gewonnen: <strong>${escapeHtml(winnerStr)}</strong></div>
             <div class="match-meta">${escapeHtml(timeLabel)}</div>
-            <button class="btn small danger" type="button" onclick="deleteMatch('${match.id}')">Spiel löschen</button>
+            <button class="btn small danger" type="button" onclick="deleteMatch('${m.id}')">Spiel löschen</button>
           </article>`;
       }).join('');
     }
 
-    function renderSummary() {
-      const winsLeader = getSortedByWins()[0];
-      const pointsLeader = getSortedByPoints()[0];
-      els.playersCount.textContent = String(state.players.length);
-      els.matchesCount.textContent = String(state.matches.length);
-      els.leaderName.textContent = winsLeader ? winsLeader.name : '-';
-      els.pointsLeaderName.textContent = pointsLeader ? pointsLeader.name : '-';
-      els.summaryText.textContent = state.players.length
-        ? `${state.players.length} Spieler, ${state.matches.length} Spiele`
-        : 'Noch keine Daten';
+    function renderFilterBadge() {
+      if (filter.from || filter.to || filter.name) {
+        const label = filter.name
+          ? filter.name + (filter.from||filter.to ? ' · '+formatDateRange(filter.from,filter.to) : '')
+          : formatDateRange(filter.from, filter.to);
+        els.activeFilterBadge.innerHTML = `<span class="active-filter-badge">🔍 ${escapeHtml(label)}</span>`;
+      } else {
+        els.activeFilterBadge.innerHTML = '<span class="muted">Alle Spiele</span>';
+      }
     }
 
     function render() {
-      renderSummary();
+      const filteredMatches = getFilteredMatches();
+      const stats = getSortedStats(buildStats(filteredMatches));
+      const leader = stats[0];
+      const pointsLeader = [...stats].sort((a,b)=>b.avgPoints-a.avgPoints)[0];
+
+      els.playersCount.textContent = String(state.players.length);
+      els.matchesCount.textContent = String(filteredMatches.length);
+      els.leaderName.textContent = leader ? leader.name : '-';
+      els.pointsLeaderName.textContent = pointsLeader ? pointsLeader.name : '-';
+      els.summaryText.textContent = state.players.length
+        ? `${state.players.length} Spieler, ${filteredMatches.length} Spiele`
+        : 'Noch keine Daten';
+
+      renderFilterBadge();
       renderSelects();
-      renderRanking(els.winsList, getSortedByWins(), 'wins');
-      renderRanking(els.pointsList, getSortedByPoints(), 'points');
-      renderMatches();
+      renderRanking(stats);
+      renderMatches(filteredMatches);
     }
 
+    // ---- Events ----
     els.addPlayerBtn.addEventListener('click', () => addPlayer(els.playerNameInput.value));
-    els.playerNameInput.addEventListener('keydown', e => { if (e.key === 'Enter') addPlayer(els.playerNameInput.value); });
+    els.playerNameInput.addEventListener('keydown', e => { if(e.key==='Enter') addPlayer(els.playerNameInput.value); });
     els.teamAWinBtn.addEventListener('click', () => recordMatch('A'));
     els.teamBWinBtn.addEventListener('click', () => recordMatch('B'));
     els.exportBtn.addEventListener('click', exportCsv);
     els.importBtn.addEventListener('click', () => els.fileInput.click());
     els.fileInput.addEventListener('change', e => {
-      const file = e.target.files?.[0];
-      if (file) importCsv(file);
-      e.target.value = '';
+      const f = e.target.files?.[0]; if(f) importCsv(f); e.target.value='';
     });
     els.resetBtn.addEventListener('click', () => {
-      if (!confirm('Wirklich alle Daten löschen?')) return;
-      state.players = []; state.matches = [];
+      if(!confirm('Wirklich alle Daten löschen?')) return;
+      state.players=[]; state.matches=[];
       clearScoreInputs(); render();
     });
+    els.applyFilterBtn.addEventListener('click', () => {
+      const fromVal = els.filterFrom.value;
+      const toVal = els.filterTo.value;
+      filter.from = fromVal ? new Date(fromVal).getTime() : null;
+      filter.to = toVal ? new Date(toVal).getTime() : null;
+      filter.name = els.filterName.value.trim();
+      render();
+    });
+    els.clearFilterBtn.addEventListener('click', () => {
+      filter.from = null; filter.to = null; filter.name = '';
+      els.filterFrom.value = ''; els.filterTo.value = ''; els.filterName.value = '';
+      render();
+    });
+    els.exportImageBtn.addEventListener('click', exportImage);
 
     (function initTheme() {
       const root = document.documentElement;
       let dark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
       function apply() {
-        root.setAttribute('data-theme', dark ? 'dark' : 'light');
-        els.themeBtn.textContent = dark ? '☀️' : '🌙';
+        root.setAttribute('data-theme', dark?'dark':'light');
+        els.themeBtn.textContent = dark?'☀️':'🌙';
       }
-      els.themeBtn.addEventListener('click', () => { dark = !dark; apply(); });
+      els.themeBtn.addEventListener('click', ()=>{ dark=!dark; apply(); });
       apply();
     })();
 
@@ -640,4 +785,3 @@
   </script>
 </body>
 </html>
-
