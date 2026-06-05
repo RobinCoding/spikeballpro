@@ -1,1 +1,899 @@
-h
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Spikeball Spieler Tracker</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --line: #dbe1e8;
+      --primary: #0f766e;
+      --primary-strong: #115e59;
+      --secondary: #eef2f7;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+      --shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --line: #273449;
+      --primary: #2dd4bf;
+      --primary-strong: #14b8a6;
+      --secondary: #1f2937;
+      --danger: #f87171;
+      --danger-bg: #2b1417;
+      --shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    .app {
+      width: min(100%, 720px);
+      margin: 0 auto;
+      padding: 16px 14px 28px;
+      padding-bottom: calc(28px + env(safe-area-inset-bottom));
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+    }
+    .skip-link:focus {
+      left: 12px;
+      top: 12px;
+      z-index: 20;
+      background: var(--card);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+      display: grid;
+      place-items: center;
+      color: white;
+      flex: 0 0 auto;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .row, .grid-2 {
+      display: grid;
+      gap: 10px;
+    }
+
+    .grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--secondary);
+      color: var(--text);
+      padding: 0 14px;
+      outline: none;
+    }
+
+    input[type="text"]:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.18);
+    }
+
+    .btn {
+      min-height: 48px;
+      border: 0;
+      border-radius: 14px;
+      padding: 0 14px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text);
+      background: var(--secondary);
+      transition: transform 0.05s ease, opacity 0.2s ease, background 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:active { transform: scale(0.98); }
+    .btn.primary { background: var(--primary); color: #fff; }
+    .btn.primary:hover { background: var(--primary-strong); }
+    .btn.danger { background: var(--danger-bg); color: var(--danger); }
+    .btn.small {
+      min-height: 36px;
+      min-width: 36px;
+      padding: 0 10px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat-box {
+      background: var(--secondary);
+      border-radius: 16px;
+      padding: 12px;
+      text-align: center;
+      border: 1px solid var(--line);
+    }
+
+    .stat-box strong {
+      display: block;
+      font-size: 1.35rem;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .team-box {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: var(--secondary);
+    }
+
+    .team-box h3 {
+      margin: 0 0 10px;
+      font-size: 0.98rem;
+    }
+
+    .team-actions {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .player-item, .match-item {
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .player-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .rank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: var(--secondary);
+      border: 1px solid var(--line);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .player-name {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .player-sub {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 2px;
+    }
+
+    .pill-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .pill {
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: var(--secondary);
+      border: 1px solid var(--line);
+    }
+
+    .pill-label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .pill-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .adjust-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .match-item {
+      display: grid;
+      gap: 8px;
+    }
+
+    .match-meta {
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .empty {
+      padding: 12px;
+      border-radius: 16px;
+      background: var(--secondary);
+      border: 1px dashed var(--line);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.84rem;
+      padding: 4px 0 12px;
+    }
+
+    @media (max-width: 480px) {
+      .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+      .grid-2,
+      .stats,
+      .pill-row,
+      .adjust-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-label="Spikeball Logo">
+            <circle cx="12" cy="12" r="7"></circle>
+            <path d="M5 15.5h14"></path>
+            <path d="M8.5 8.5l7 7"></path>
+          </svg>
+        </div>
+        <div>
+          <h1>Spikeball Spieler Tracker</h1>
+          <p>Einfach am Handy benutzen, CSV exportieren, später wieder importieren.</p>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="btn" id="importBtn" type="button">Import</button>
+        <button class="btn primary" id="exportBtn" type="button">Export</button>
+        <button class="btn" id="themeBtn" type="button" aria-label="Farbschema wechseln">🌙</button>
+        <button class="btn danger" id="resetBtn" type="button">Alles löschen</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="card">
+        <div class="section-head">
+          <h2>Übersicht</h2>
+          <span class="muted" id="summaryText">Noch keine Daten</span>
+        </div>
+        <div class="stats">
+          <div class="stat-box">
+            <strong id="playersCount">0</strong>
+            <span>Spieler</span>
+          </div>
+          <div class="stat-box">
+            <strong id="matchesCount">0</strong>
+            <span>Spiele</span>
+          </div>
+          <div class="stat-box">
+            <strong id="leaderName">-</strong>
+            <span>Aktuell vorne</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Spieler hinzufügen</h2>
+          <span class="muted">Einfach Name eingeben</span>
+        </div>
+        <div class="row">
+          <input id="playerNameInput" type="text" placeholder="z. B. Robin" maxlength="40" />
+          <button class="btn primary" id="addPlayerBtn" type="button">Spieler hinzufügen</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Spiel eintragen</h2>
+          <span class="muted">4 Spieler auswählen, Sieger-Team antippen</span>
+        </div>
+        <div class="grid-2">
+          <div class="team-box">
+            <h3>Team 1</h3>
+            <div class="row">
+              <select id="teamA1"></select>
+              <select id="teamA2"></select>
+            </div>
+          </div>
+          <div class="team-box">
+            <h3>Team 2</h3>
+            <div class="row">
+              <select id="teamB1"></select>
+              <select id="teamB2"></select>
+            </div>
+          </div>
+        </div>
+        <div class="team-actions">
+          <button class="btn primary" id="teamAWinBtn" type="button">+ Team 1 gewinnt</button>
+          <button class="btn primary" id="teamBWinBtn" type="button">+ Team 2 gewinnt</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Rangliste</h2>
+          <span class="muted">Sortiert nach Siegen</span>
+        </div>
+        <div id="playersList" class="list"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Letzte Spiele</h2>
+          <span class="muted">Mit Undo pro Eintrag</span>
+        </div>
+        <div id="matchesList" class="list"></div>
+      </section>
+
+      <p class="footer-note">CSV wird nur beim Export gespeichert. Ohne Import startet die App absichtlich leer.</p>
+    </main>
+  </div>
+
+  <input id="fileInput" type="file" accept=".csv,text/csv" hidden />
+
+  <script>
+    const state = {
+      players: [],
+      matches: []
+    };
+
+    const els = {
+      playerNameInput: document.getElementById('playerNameInput'),
+      addPlayerBtn: document.getElementById('addPlayerBtn'),
+      importBtn: document.getElementById('importBtn'),
+      exportBtn: document.getElementById('exportBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      themeBtn: document.getElementById('themeBtn'),
+      fileInput: document.getElementById('fileInput'),
+      playersCount: document.getElementById('playersCount'),
+      matchesCount: document.getElementById('matchesCount'),
+      leaderName: document.getElementById('leaderName'),
+      summaryText: document.getElementById('summaryText'),
+      playersList: document.getElementById('playersList'),
+      matchesList: document.getElementById('matchesList'),
+      teamA1: document.getElementById('teamA1'),
+      teamA2: document.getElementById('teamA2'),
+      teamB1: document.getElementById('teamB1'),
+      teamB2: document.getElementById('teamB2'),
+      teamAWinBtn: document.getElementById('teamAWinBtn'),
+      teamBWinBtn: document.getElementById('teamBWinBtn')
+    };
+
+    function uid() {
+      return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function csvEscape(value) {
+      const text = String(value ?? '');
+      if (/[",\n]/.test(text)) {
+        return '"' + text.replaceAll('"', '""') + '"';
+      }
+      return text;
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let row = [];
+      let cell = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            cell += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          row.push(cell);
+          cell = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (char === '\r' && next === '\n') i++;
+          row.push(cell);
+          if (row.some(item => item !== '')) rows.push(row);
+          row = [];
+          cell = '';
+        } else {
+          cell += char;
+        }
+      }
+
+      if (cell.length || row.length) {
+        row.push(cell);
+        if (row.some(item => item !== '')) rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function getSortedPlayers() {
+      return [...state.players].sort((a, b) => {
+        if (b.wins !== a.wins) return b.wins - a.wins;
+        if (b.played !== a.played) return b.played - a.played;
+        return a.name.localeCompare(b.name, 'de');
+      });
+    }
+
+    function getPlayerById(id) {
+      return state.players.find(player => player.id === id);
+    }
+
+    function addPlayer(name) {
+      const cleanName = name.trim();
+      if (!cleanName) {
+        alert('Bitte einen Namen eingeben.');
+        return;
+      }
+
+      const duplicate = state.players.some(player => player.name.toLowerCase() === cleanName.toLowerCase());
+      if (duplicate) {
+        alert('Diesen Spieler gibt es schon.');
+        return;
+      }
+
+      state.players.push({
+        id: uid(),
+        name: cleanName,
+        wins: 0,
+        played: 0
+      });
+
+      els.playerNameInput.value = '';
+      render();
+    }
+
+    function changeStat(playerId, field, delta) {
+      const player = getPlayerById(playerId);
+      if (!player) return;
+      player[field] = Math.max(0, Number(player[field] || 0) + delta);
+      if (field === 'wins' && player.wins > player.played) {
+        player.played = player.wins;
+      }
+      if (field === 'played' && player.played < player.wins) {
+        player.wins = player.played;
+      }
+      render();
+    }
+
+    function getSelectedMatchPlayers() {
+      return [els.teamA1.value, els.teamA2.value, els.teamB1.value, els.teamB2.value].filter(Boolean);
+    }
+
+    function recordMatch(winner) {
+      if (state.players.length < 4) {
+        alert('Du brauchst mindestens 4 Spieler.');
+        return;
+      }
+
+      const ids = getSelectedMatchPlayers();
+      if (ids.length !== 4) {
+        alert('Bitte alle 4 Spieler auswählen.');
+        return;
+      }
+
+      const uniqueIds = new Set(ids);
+      if (uniqueIds.size !== 4) {
+        alert('Jeder Spieler darf in einem Spiel nur einmal vorkommen.');
+        return;
+      }
+
+      const match = {
+        id: uid(),
+        a1: els.teamA1.value,
+        a2: els.teamA2.value,
+        b1: els.teamB1.value,
+        b2: els.teamB2.value,
+        winner,
+        createdAt: new Date().toISOString()
+      };
+
+      const winners = winner === 'A' ? [match.a1, match.a2] : [match.b1, match.b2];
+      [match.a1, match.a2, match.b1, match.b2].forEach(id => {
+        const player = getPlayerById(id);
+        if (player) player.played += 1;
+      });
+      winners.forEach(id => {
+        const player = getPlayerById(id);
+        if (player) player.wins += 1;
+      });
+
+      state.matches.unshift(match);
+      render();
+    }
+
+    function deleteMatch(matchId) {
+      const index = state.matches.findIndex(match => match.id === matchId);
+      if (index === -1) return;
+      const match = state.matches[index];
+      const winners = match.winner === 'A' ? [match.a1, match.a2] : [match.b1, match.b2];
+
+      [match.a1, match.a2, match.b1, match.b2].forEach(id => {
+        const player = getPlayerById(id);
+        if (player) player.played = Math.max(0, player.played - 1);
+      });
+      winners.forEach(id => {
+        const player = getPlayerById(id);
+        if (player) player.wins = Math.max(0, player.wins - 1);
+      });
+
+      state.matches.splice(index, 1);
+      render();
+    }
+
+    function exportCsv() {
+      const lines = [];
+      lines.push(['type','id','name','wins','played','a1','a2','b1','b2','winner','createdAt'].join(','));
+
+      state.players.forEach(player => {
+        lines.push([
+          'player',
+          csvEscape(player.id),
+          csvEscape(player.name),
+          player.wins,
+          player.played,
+          '', '', '', '', '', ''
+        ].join(','));
+      });
+
+      state.matches.forEach(match => {
+        lines.push([
+          'match',
+          csvEscape(match.id),
+          '', '', '',
+          csvEscape(match.a1),
+          csvEscape(match.a2),
+          csvEscape(match.b1),
+          csvEscape(match.b2),
+          csvEscape(match.winner),
+          csvEscape(match.createdAt)
+        ].join(','));
+      });
+
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'spikeball-daten.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function importCsv(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const rows = parseCsv(String(reader.result || '').trim());
+          if (!rows.length) throw new Error('Leere Datei');
+
+          const bodyRows = rows.slice(1);
+          const importedPlayers = [];
+          const importedMatches = [];
+
+          bodyRows.forEach(columns => {
+            const [type, id, name, wins, played, a1, a2, b1, b2, winner, createdAt] = columns;
+            if (type === 'player') {
+              importedPlayers.push({
+                id: id || uid(),
+                name: (name || '').trim(),
+                wins: Math.max(0, Number(wins || 0)),
+                played: Math.max(0, Number(played || 0))
+              });
+            }
+            if (type === 'match') {
+              importedMatches.push({
+                id: id || uid(),
+                a1, a2, b1, b2,
+                winner: winner === 'B' ? 'B' : 'A',
+                createdAt: createdAt || new Date().toISOString()
+              });
+            }
+          });
+
+          const validPlayers = importedPlayers.filter(player => player.name);
+          state.players = validPlayers.map(player => ({
+            ...player,
+            wins: Math.min(player.wins, player.played)
+          }));
+          state.matches = importedMatches.filter(match =>
+            [match.a1, match.a2, match.b1, match.b2].every(id => state.players.some(player => player.id === id))
+          );
+
+          render();
+        } catch (error) {
+          alert('CSV konnte nicht importiert werden.');
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+    }
+
+    function formatMatch(match) {
+      const a1 = getPlayerById(match.a1)?.name || 'Unbekannt';
+      const a2 = getPlayerById(match.a2)?.name || 'Unbekannt';
+      const b1 = getPlayerById(match.b1)?.name || 'Unbekannt';
+      const b2 = getPlayerById(match.b2)?.name || 'Unbekannt';
+      const winner = match.winner === 'A' ? `${a1} & ${a2}` : `${b1} & ${b2}`;
+      return {
+        teams: `${a1} & ${a2} vs. ${b1} & ${b2}`,
+        winner
+      };
+    }
+
+    function renderSelects() {
+      const options = ['<option value="">Bitte wählen</option>']
+        .concat(state.players.map(player => `<option value="${escapeHtml(player.id)}">${escapeHtml(player.name)}</option>`))
+        .join('');
+
+      [els.teamA1, els.teamA2, els.teamB1, els.teamB2].forEach(select => {
+        const current = select.value;
+        select.innerHTML = options;
+        if (state.players.some(player => player.id === current)) {
+          select.value = current;
+        }
+      });
+    }
+
+    function renderPlayers() {
+      const sortedPlayers = getSortedPlayers();
+      if (!sortedPlayers.length) {
+        els.playersList.innerHTML = '<div class="empty">Noch keine Spieler eingetragen.</div>';
+        return;
+      }
+
+      els.playersList.innerHTML = sortedPlayers.map((player, index) => {
+        const quote = player.played ? Math.round((player.wins / player.played) * 100) : 0;
+        return `
+          <article class="player-item">
+            <div class="player-top">
+              <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+                <span class="rank">#${index + 1}</span>
+                <div>
+                  <div class="player-name">${escapeHtml(player.name)}</div>
+                  <div class="player-sub">Quote ${quote}%</div>
+                </div>
+              </div>
+            </div>
+            <div class="pill-row">
+              <div class="pill">
+                <span class="pill-label">Siege</span>
+                <span class="pill-value">${player.wins}</span>
+              </div>
+              <div class="pill">
+                <span class="pill-label">Spiele</span>
+                <span class="pill-value">${player.played}</span>
+              </div>
+            </div>
+            <div class="adjust-row">
+              <button class="btn small" type="button" onclick="changeStat('${player.id}', 'wins', 1)">+ Sieg</button>
+              <button class="btn small" type="button" onclick="changeStat('${player.id}', 'played', 1)">+ Spiel</button>
+              <button class="btn small" type="button" onclick="changeStat('${player.id}', 'wins', -1)">- Sieg</button>
+              <button class="btn small danger" type="button" onclick="changeStat('${player.id}', 'played', -1)">- Spiel</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderMatches() {
+      if (!state.matches.length) {
+        els.matchesList.innerHTML = '<div class="empty">Noch keine Spiele erfasst.</div>';
+        return;
+      }
+
+      els.matchesList.innerHTML = state.matches.slice(0, 20).map(match => {
+        const data = formatMatch(match);
+        const date = new Date(match.createdAt);
+        const timeLabel = Number.isNaN(date.getTime()) ? '' : date.toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' });
+        return `
+          <article class="match-item">
+            <strong>${escapeHtml(data.teams)}</strong>
+            <div>Gewonnen: <strong>${escapeHtml(data.winner)}</strong></div>
+            <div class="match-meta">${escapeHtml(timeLabel)}</div>
+            <button class="btn small danger" type="button" onclick="deleteMatch('${match.id}')">Spiel löschen</button>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderSummary() {
+      const sorted = getSortedPlayers();
+      const leader = sorted[0];
+      els.playersCount.textContent = String(state.players.length);
+      els.matchesCount.textContent = String(state.matches.length);
+      els.leaderName.textContent = leader ? leader.name : '-';
+      els.summaryText.textContent = state.players.length
+        ? `${state.players.length} Spieler, ${state.matches.length} Spiele`
+        : 'Noch keine Daten';
+    }
+
+    function render() {
+      renderSummary();
+      renderSelects();
+      renderPlayers();
+      renderMatches();
+    }
+
+    els.addPlayerBtn.addEventListener('click', () => addPlayer(els.playerNameInput.value));
+    els.playerNameInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter') addPlayer(els.playerNameInput.value);
+    });
+    els.teamAWinBtn.addEventListener('click', () => recordMatch('A'));
+    els.teamBWinBtn.addEventListener('click', () => recordMatch('B'));
+    els.exportBtn.addEventListener('click', exportCsv);
+    els.importBtn.addEventListener('click', () => els.fileInput.click());
+    els.fileInput.addEventListener('change', event => {
+      const file = event.target.files?.[0];
+      if (file) importCsv(file);
+      event.target.value = '';
+    });
+    els.resetBtn.addEventListener('click', () => {
+      if (!confirm('Wirklich alle Daten löschen?')) return;
+      state.players = [];
+      state.matches = [];
+      render();
+    });
+
+    (function initTheme() {
+      const root = document.documentElement;
+      let dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      function apply() {
+        root.setAttribute('data-theme', dark ? 'dark' : 'light');
+        els.themeBtn.textContent = dark ? '☀️' : '🌙';
+      }
+      els.themeBtn.addEventListener('click', () => {
+        dark = !dark;
+        apply();
+      });
+      apply();
+    })();
+
+    window.changeStat = changeStat;
+    window.deleteMatch = deleteMatch;
+
+    render();
+  </script>
+</body>
+</html>
