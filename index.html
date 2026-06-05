@@ -44,9 +44,7 @@
       min-height: 100vh;
     }
 
-    button, input, select {
-      font: inherit;
-    }
+    button, input, select { font: inherit; }
 
     .app {
       width: min(100%, 720px);
@@ -144,16 +142,15 @@
       font-size: 0.92rem;
     }
 
-    .row, .grid-2 {
+    .row, .grid-2, .grid-3 {
       display: grid;
       gap: 10px;
     }
 
-    .grid-2 {
-      grid-template-columns: 1fr 1fr;
-    }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
 
-    input[type="text"], select {
+    input[type="text"], input[type="number"], select {
       width: 100%;
       min-height: 48px;
       border-radius: 14px;
@@ -164,7 +161,9 @@
       outline: none;
     }
 
-    input[type="text"]:focus, select:focus {
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.18);
     }
@@ -200,7 +199,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
       margin-top: 12px;
     }
@@ -215,7 +214,7 @@
 
     .stat-box strong {
       display: block;
-      font-size: 1.35rem;
+      font-size: 1.2rem;
       line-height: 1.1;
       margin-bottom: 4px;
     }
@@ -232,16 +231,34 @@
       font-size: 0.98rem;
     }
 
+    .score-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .score-field {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: var(--secondary);
+    }
+
+    .score-field label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-bottom: 6px;
+    }
+
     .team-actions {
       display: grid;
       gap: 8px;
       margin-top: 12px;
     }
 
-    .list {
-      display: grid;
-      gap: 10px;
-    }
+    .list { display: grid; gap: 10px; }
 
     .player-item, .match-item {
       border: 1px solid var(--line);
@@ -284,9 +301,8 @@
 
     .pill-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
-      margin-bottom: 10px;
     }
 
     .pill {
@@ -308,17 +324,7 @@
       font-weight: 700;
     }
 
-    .adjust-row {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .match-item {
-      display: grid;
-      gap: 8px;
-    }
-
+    .match-item { display: grid; gap: 8px; }
     .match-meta {
       color: var(--muted);
       font-size: 0.86rem;
@@ -341,13 +347,12 @@
     }
 
     @media (max-width: 480px) {
-      .toolbar {
-        grid-template-columns: 1fr 1fr;
-      }
+      .toolbar,
       .grid-2,
+      .grid-3,
       .stats,
       .pill-row,
-      .adjust-row {
+      .score-box {
         grid-template-columns: 1fr;
       }
     }
@@ -359,7 +364,7 @@
     <header class="topbar">
       <div class="brand">
         <div class="logo" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-label="Spikeball Logo">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="7"></circle>
             <path d="M5 15.5h14"></path>
             <path d="M8.5 8.5l7 7"></path>
@@ -367,7 +372,7 @@
         </div>
         <div>
           <h1>Spikeball Spieler Tracker</h1>
-          <p>Einfach am Handy benutzen, CSV exportieren, später wieder importieren.</p>
+          <p>CSV importieren, Spiele mit Punkten eintragen, zwei Ranglisten sehen.</p>
         </div>
       </div>
       <div class="toolbar">
@@ -395,7 +400,11 @@
           </div>
           <div class="stat-box">
             <strong id="leaderName">-</strong>
-            <span>Aktuell vorne</span>
+            <span>Siege vorne</span>
+          </div>
+          <div class="stat-box">
+            <strong id="pointsLeaderName">-</strong>
+            <span>Punkte vorne</span>
           </div>
         </div>
       </section>
@@ -414,7 +423,7 @@
       <section class="card">
         <div class="section-head">
           <h2>Spiel eintragen</h2>
-          <span class="muted">4 Spieler auswählen, Sieger-Team antippen</span>
+          <span class="muted">Teams wählen, Punkte eintragen, Sieger-Team speichern</span>
         </div>
         <div class="grid-2">
           <div class="team-box">
@@ -432,29 +441,47 @@
             </div>
           </div>
         </div>
+        <div class="score-box">
+          <div class="score-field">
+            <label for="scoreA">Punkte Team 1</label>
+            <input id="scoreA" type="number" inputmode="numeric" min="0" step="1" placeholder="11" />
+          </div>
+          <div class="score-field">
+            <label for="scoreB">Punkte Team 2</label>
+            <input id="scoreB" type="number" inputmode="numeric" min="0" step="1" placeholder="4" />
+          </div>
+        </div>
         <div class="team-actions">
-          <button class="btn primary" id="teamAWinBtn" type="button">+ Team 1 gewinnt</button>
-          <button class="btn primary" id="teamBWinBtn" type="button">+ Team 2 gewinnt</button>
+          <button class="btn primary" id="teamAWinBtn" type="button">Spiel speichern: Team 1 gewinnt</button>
+          <button class="btn primary" id="teamBWinBtn" type="button">Spiel speichern: Team 2 gewinnt</button>
         </div>
       </section>
 
       <section class="card">
         <div class="section-head">
-          <h2>Rangliste</h2>
+          <h2>Siegerliste</h2>
           <span class="muted">Sortiert nach Siegen</span>
         </div>
-        <div id="playersList" class="list"></div>
+        <div id="winsList" class="list"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Punkteliste</h2>
+          <span class="muted">Sortiert nach Gesamtpunkten</span>
+        </div>
+        <div id="pointsList" class="list"></div>
       </section>
 
       <section class="card">
         <div class="section-head">
           <h2>Letzte Spiele</h2>
-          <span class="muted">Mit Undo pro Eintrag</span>
+          <span class="muted">Mit Punkten und Löschen</span>
         </div>
         <div id="matchesList" class="list"></div>
       </section>
 
-      <p class="footer-note">CSV wird nur beim Export gespeichert. Ohne Import startet die App absichtlich leer.</p>
+      <p class="footer-note">CSV wird nur beim Export gespeichert. Ohne Import startet die App wieder leer.</p>
     </main>
   </div>
 
@@ -477,13 +504,17 @@
       playersCount: document.getElementById('playersCount'),
       matchesCount: document.getElementById('matchesCount'),
       leaderName: document.getElementById('leaderName'),
+      pointsLeaderName: document.getElementById('pointsLeaderName'),
       summaryText: document.getElementById('summaryText'),
-      playersList: document.getElementById('playersList'),
+      winsList: document.getElementById('winsList'),
+      pointsList: document.getElementById('pointsList'),
       matchesList: document.getElementById('matchesList'),
       teamA1: document.getElementById('teamA1'),
       teamA2: document.getElementById('teamA2'),
       teamB1: document.getElementById('teamB1'),
       teamB2: document.getElementById('teamB2'),
+      scoreA: document.getElementById('scoreA'),
+      scoreB: document.getElementById('scoreB'),
       teamAWinBtn: document.getElementById('teamAWinBtn'),
       teamBWinBtn: document.getElementById('teamBWinBtn')
     };
@@ -503,9 +534,7 @@
 
     function csvEscape(value) {
       const text = String(value ?? '');
-      if (/[",\n]/.test(text)) {
-        return '"' + text.replaceAll('"', '""') + '"';
-      }
+      if (/[",\n]/.test(text)) return '"' + text.replaceAll('"', '""') + '"';
       return text;
     }
 
@@ -548,76 +577,64 @@
       return rows;
     }
 
-    function getSortedPlayers() {
+    function getPlayerById(id) {
+      return state.players.find(player => player.id === id);
+    }
+
+    function getSortedByWins() {
       return [...state.players].sort((a, b) => {
+        if (b.wins !== a.wins) return b.wins - a.wins;
+        if (b.points !== a.points) return b.points - a.points;
+        if (b.played !== a.played) return b.played - a.played;
+        return a.name.localeCompare(b.name, 'de');
+      });
+    }
+
+    function getSortedByPoints() {
+      return [...state.players].sort((a, b) => {
+        if (b.points !== a.points) return b.points - a.points;
         if (b.wins !== a.wins) return b.wins - a.wins;
         if (b.played !== a.played) return b.played - a.played;
         return a.name.localeCompare(b.name, 'de');
       });
     }
 
-    function getPlayerById(id) {
-      return state.players.find(player => player.id === id);
-    }
-
     function addPlayer(name) {
       const cleanName = name.trim();
-      if (!cleanName) {
-        alert('Bitte einen Namen eingeben.');
-        return;
-      }
+      if (!cleanName) return alert('Bitte einen Namen eingeben.');
 
       const duplicate = state.players.some(player => player.name.toLowerCase() === cleanName.toLowerCase());
-      if (duplicate) {
-        alert('Diesen Spieler gibt es schon.');
-        return;
-      }
+      if (duplicate) return alert('Diesen Spieler gibt es schon.');
 
-      state.players.push({
-        id: uid(),
-        name: cleanName,
-        wins: 0,
-        played: 0
-      });
-
+      state.players.push({ id: uid(), name: cleanName, wins: 0, played: 0, points: 0 });
       els.playerNameInput.value = '';
       render();
     }
 
-    function changeStat(playerId, field, delta) {
-      const player = getPlayerById(playerId);
-      if (!player) return;
-      player[field] = Math.max(0, Number(player[field] || 0) + delta);
-      if (field === 'wins' && player.wins > player.played) {
-        player.played = player.wins;
-      }
-      if (field === 'played' && player.played < player.wins) {
-        player.wins = player.played;
-      }
-      render();
-    }
-
-    function getSelectedMatchPlayers() {
+    function getSelectedPlayers() {
       return [els.teamA1.value, els.teamA2.value, els.teamB1.value, els.teamB2.value].filter(Boolean);
     }
 
+    function clearScoreInputs() {
+      els.scoreA.value = '';
+      els.scoreB.value = '';
+    }
+
     function recordMatch(winner) {
-      if (state.players.length < 4) {
-        alert('Du brauchst mindestens 4 Spieler.');
-        return;
-      }
+      if (state.players.length < 4) return alert('Du brauchst mindestens 4 Spieler.');
 
-      const ids = getSelectedMatchPlayers();
-      if (ids.length !== 4) {
-        alert('Bitte alle 4 Spieler auswählen.');
-        return;
-      }
+      const ids = getSelectedPlayers();
+      if (ids.length !== 4) return alert('Bitte alle 4 Spieler auswählen.');
+      if (new Set(ids).size !== 4) return alert('Jeder Spieler darf in einem Spiel nur einmal vorkommen.');
 
-      const uniqueIds = new Set(ids);
-      if (uniqueIds.size !== 4) {
-        alert('Jeder Spieler darf in einem Spiel nur einmal vorkommen.');
-        return;
+      const scoreA = Number(els.scoreA.value);
+      const scoreB = Number(els.scoreB.value);
+      if (!Number.isInteger(scoreA) || scoreA < 0 || !Number.isInteger(scoreB) || scoreB < 0) {
+        return alert('Bitte gültige Punkte für beide Teams eintragen.');
       }
+      if (scoreA === scoreB) return alert('Die Punkte dürfen nicht gleich sein.');
+      if (winner === 'A' && scoreA <= scoreB) return alert('Wenn Team 1 gewinnt, muss Team 1 mehr Punkte haben.');
+      if (winner === 'B' && scoreB <= scoreA) return alert('Wenn Team 2 gewinnt, muss Team 2 mehr Punkte haben.');
 
       const match = {
         id: uid(),
@@ -625,21 +642,31 @@
         a2: els.teamA2.value,
         b1: els.teamB1.value,
         b2: els.teamB2.value,
+        scoreA,
+        scoreB,
         winner,
         createdAt: new Date().toISOString()
       };
 
-      const winners = winner === 'A' ? [match.a1, match.a2] : [match.b1, match.b2];
       [match.a1, match.a2, match.b1, match.b2].forEach(id => {
         const player = getPlayerById(id);
         if (player) player.played += 1;
       });
-      winners.forEach(id => {
+      [match.a1, match.a2].forEach(id => {
+        const player = getPlayerById(id);
+        if (player) player.points += scoreA;
+      });
+      [match.b1, match.b2].forEach(id => {
+        const player = getPlayerById(id);
+        if (player) player.points += scoreB;
+      });
+      (winner === 'A' ? [match.a1, match.a2] : [match.b1, match.b2]).forEach(id => {
         const player = getPlayerById(id);
         if (player) player.wins += 1;
       });
 
       state.matches.unshift(match);
+      clearScoreInputs();
       render();
     }
 
@@ -647,13 +674,20 @@
       const index = state.matches.findIndex(match => match.id === matchId);
       if (index === -1) return;
       const match = state.matches[index];
-      const winners = match.winner === 'A' ? [match.a1, match.a2] : [match.b1, match.b2];
 
       [match.a1, match.a2, match.b1, match.b2].forEach(id => {
         const player = getPlayerById(id);
         if (player) player.played = Math.max(0, player.played - 1);
       });
-      winners.forEach(id => {
+      [match.a1, match.a2].forEach(id => {
+        const player = getPlayerById(id);
+        if (player) player.points = Math.max(0, player.points - Number(match.scoreA || 0));
+      });
+      [match.b1, match.b2].forEach(id => {
+        const player = getPlayerById(id);
+        if (player) player.points = Math.max(0, player.points - Number(match.scoreB || 0));
+      });
+      (match.winner === 'A' ? [match.a1, match.a2] : [match.b1, match.b2]).forEach(id => {
         const player = getPlayerById(id);
         if (player) player.wins = Math.max(0, player.wins - 1);
       });
@@ -664,30 +698,20 @@
 
     function exportCsv() {
       const lines = [];
-      lines.push(['type','id','name','wins','played','a1','a2','b1','b2','winner','createdAt'].join(','));
+      lines.push(['type','id','name','wins','played','points','a1','a2','b1','b2','scoreA','scoreB','winner','createdAt'].join(','));
 
       state.players.forEach(player => {
         lines.push([
-          'player',
-          csvEscape(player.id),
-          csvEscape(player.name),
-          player.wins,
-          player.played,
-          '', '', '', '', '', ''
+          'player', csvEscape(player.id), csvEscape(player.name), player.wins, player.played, player.points,
+          '', '', '', '', '', '', '', ''
         ].join(','));
       });
 
       state.matches.forEach(match => {
         lines.push([
-          'match',
-          csvEscape(match.id),
-          '', '', '',
-          csvEscape(match.a1),
-          csvEscape(match.a2),
-          csvEscape(match.b1),
-          csvEscape(match.b2),
-          csvEscape(match.winner),
-          csvEscape(match.createdAt)
+          'match', csvEscape(match.id), '', '', '', '',
+          csvEscape(match.a1), csvEscape(match.a2), csvEscape(match.b1), csvEscape(match.b2),
+          match.scoreA, match.scoreB, csvEscape(match.winner), csvEscape(match.createdAt)
         ].join(','));
       });
 
@@ -714,34 +738,32 @@
           const importedMatches = [];
 
           bodyRows.forEach(columns => {
-            const [type, id, name, wins, played, a1, a2, b1, b2, winner, createdAt] = columns;
+            const [type, id, name, wins, played, points, a1, a2, b1, b2, scoreA, scoreB, winner, createdAt] = columns;
             if (type === 'player') {
               importedPlayers.push({
                 id: id || uid(),
                 name: (name || '').trim(),
                 wins: Math.max(0, Number(wins || 0)),
-                played: Math.max(0, Number(played || 0))
+                played: Math.max(0, Number(played || 0)),
+                points: Math.max(0, Number(points || 0))
               });
             }
             if (type === 'match') {
               importedMatches.push({
                 id: id || uid(),
                 a1, a2, b1, b2,
+                scoreA: Math.max(0, Number(scoreA || 0)),
+                scoreB: Math.max(0, Number(scoreB || 0)),
                 winner: winner === 'B' ? 'B' : 'A',
                 createdAt: createdAt || new Date().toISOString()
               });
             }
           });
 
-          const validPlayers = importedPlayers.filter(player => player.name);
-          state.players = validPlayers.map(player => ({
-            ...player,
-            wins: Math.min(player.wins, player.played)
-          }));
+          state.players = importedPlayers.filter(player => player.name);
           state.matches = importedMatches.filter(match =>
             [match.a1, match.a2, match.b1, match.b2].every(id => state.players.some(player => player.id === id))
           );
-
           render();
         } catch (error) {
           alert('CSV konnte nicht importiert werden.');
@@ -757,7 +779,7 @@
       const b2 = getPlayerById(match.b2)?.name || 'Unbekannt';
       const winner = match.winner === 'A' ? `${a1} & ${a2}` : `${b1} & ${b2}`;
       return {
-        teams: `${a1} & ${a2} vs. ${b1} & ${b2}`,
+        teams: `${a1} & ${a2} (${match.scoreA}) vs. ${b1} & ${b2} (${match.scoreB})`,
         winner
       };
     }
@@ -770,21 +792,20 @@
       [els.teamA1, els.teamA2, els.teamB1, els.teamB2].forEach(select => {
         const current = select.value;
         select.innerHTML = options;
-        if (state.players.some(player => player.id === current)) {
-          select.value = current;
-        }
+        if (state.players.some(player => player.id === current)) select.value = current;
       });
     }
 
-    function renderPlayers() {
-      const sortedPlayers = getSortedPlayers();
-      if (!sortedPlayers.length) {
-        els.playersList.innerHTML = '<div class="empty">Noch keine Spieler eingetragen.</div>';
+    function renderRanking(target, players, mode) {
+      if (!players.length) {
+        target.innerHTML = '<div class="empty">Noch keine Spieler eingetragen.</div>';
         return;
       }
 
-      els.playersList.innerHTML = sortedPlayers.map((player, index) => {
+      target.innerHTML = players.map((player, index) => {
         const quote = player.played ? Math.round((player.wins / player.played) * 100) : 0;
+        const mainValue = mode === 'wins' ? player.wins : player.points;
+        const mainLabel = mode === 'wins' ? 'Siege' : 'Punkte';
         return `
           <article class="player-item">
             <div class="player-top">
@@ -792,25 +813,23 @@
                 <span class="rank">#${index + 1}</span>
                 <div>
                   <div class="player-name">${escapeHtml(player.name)}</div>
-                  <div class="player-sub">Quote ${quote}%</div>
+                  <div class="player-sub">${quote}% Siegquote</div>
                 </div>
               </div>
             </div>
             <div class="pill-row">
               <div class="pill">
-                <span class="pill-label">Siege</span>
-                <span class="pill-value">${player.wins}</span>
+                <span class="pill-label">${mainLabel}</span>
+                <span class="pill-value">${mainValue}</span>
               </div>
               <div class="pill">
                 <span class="pill-label">Spiele</span>
                 <span class="pill-value">${player.played}</span>
               </div>
-            </div>
-            <div class="adjust-row">
-              <button class="btn small" type="button" onclick="changeStat('${player.id}', 'wins', 1)">+ Sieg</button>
-              <button class="btn small" type="button" onclick="changeStat('${player.id}', 'played', 1)">+ Spiel</button>
-              <button class="btn small" type="button" onclick="changeStat('${player.id}', 'wins', -1)">- Sieg</button>
-              <button class="btn small danger" type="button" onclick="changeStat('${player.id}', 'played', -1)">- Spiel</button>
+              <div class="pill">
+                <span class="pill-label">Punkte</span>
+                <span class="pill-value">${player.points}</span>
+              </div>
             </div>
           </article>
         `;
@@ -839,11 +858,12 @@
     }
 
     function renderSummary() {
-      const sorted = getSortedPlayers();
-      const leader = sorted[0];
+      const winsLeader = getSortedByWins()[0];
+      const pointsLeader = getSortedByPoints()[0];
       els.playersCount.textContent = String(state.players.length);
       els.matchesCount.textContent = String(state.matches.length);
-      els.leaderName.textContent = leader ? leader.name : '-';
+      els.leaderName.textContent = winsLeader ? winsLeader.name : '-';
+      els.pointsLeaderName.textContent = pointsLeader ? pointsLeader.name : '-';
       els.summaryText.textContent = state.players.length
         ? `${state.players.length} Spieler, ${state.matches.length} Spiele`
         : 'Noch keine Daten';
@@ -852,7 +872,8 @@
     function render() {
       renderSummary();
       renderSelects();
-      renderPlayers();
+      renderRanking(els.winsList, getSortedByWins(), 'wins');
+      renderRanking(els.pointsList, getSortedByPoints(), 'points');
       renderMatches();
     }
 
@@ -873,6 +894,7 @@
       if (!confirm('Wirklich alle Daten löschen?')) return;
       state.players = [];
       state.matches = [];
+      clearScoreInputs();
       render();
     });
 
@@ -890,9 +912,7 @@
       apply();
     })();
 
-    window.changeStat = changeStat;
     window.deleteMatch = deleteMatch;
-
     render();
   </script>
 </body>
